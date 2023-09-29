@@ -12,10 +12,10 @@ len_config_file = '/home/fanzang2/project/complexity-based-tcp/method_len.xml'
 #test_directory = '/home/fanzang2/project/app/ctest-hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/'
 #test_directory = '/home/fanzang2/project/app/ctest-hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/hdfs/'
 #test_directory = '/home/fanzang2/project/app/ctest-alluxio/core/'
-test_directory = '/home/fanzang2/project/app/ctest-hbase/hbase-server/src/test/java/org/apache/hadoop/hbase/'
-#test_directory = '/home/fanzang2/project/zookeeper/zookeeper-server/src/test/java/org/apache/zookeeper/'
+#test_directory = '/home/fanzang2/project/app/ctest-hbase/hbase-server/src/test/java/org/apache/hadoop/hbase/'
+test_directory = '/home/fanzang2/project/app/ctest-zookeeper/zookeeper-server/src/test/java/org/apache/zookeeper/'
 package_name_start = 'org'
-tsv_file_path = 'hbase-server.tsv'
+tsv_file_path = 'zookeeper-server.tsv'
 
 def extract_java_files(directory: str):
     # extract all java test file from given directory

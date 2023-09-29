@@ -1,11 +1,11 @@
 #ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/hadoop-common/hadoop-common-testcase.tsv'
 #ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/hadoop-hdfs/hadoop-hdfs-testcase.tsv'
 #ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/alluxio-core/alluxio-core-testcase.tsv'
-ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/hbase-server/hbase-server-testcase.tsv'
-#ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/zookeeper-server/zookeeper-server-testcase.tsv'
-all_test_file = '/home/fanzang2/project/complexity-based-tcp/hbase-server.tsv'
-output_file = '/home/fanzang2/project/complexity-based-tcp/hbase-server-direct.tsv'
-missing_file = '/home/fanzang2/project/complexity-based-tcp/hbase-server-inherit.tsv'
+#ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/hbase-server/hbase-server-testcase.tsv'
+ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/zookeeper-server/zookeeper-server-testcase.tsv'
+all_test_file = '/home/fanzang2/project/complexity-based-tcp/zookeeper-server.tsv'
+output_file = '/home/fanzang2/project/complexity-based-tcp/zookeeper-server-direct.tsv'
+missing_file = '/home/fanzang2/project/complexity-based-tcp/zookeeper-server-inherit.tsv'
 used_method = []
 with open(ctest_tsv, 'r') as tsv_file:
     for line in tsv_file:
