@@ -6,8 +6,15 @@
 <module name="Checker">
   <property name="severity" value="error"/>
   <module name="TreeWalker">
+    <module name="PackageName">
+      <property name="format"
+        value="^1$"/>
+    </module>
     <module name="CyclomaticComplexity">
       <property name="max" value="0"/>
-    </module>		    
+    </module>
+    <module name="MethodLength">
+      <property name="max" value="0"/>
+    </module>	    
   </module>	    
 </module>
