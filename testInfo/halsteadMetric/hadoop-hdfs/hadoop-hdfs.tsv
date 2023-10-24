@@ -620,5 +620,6 @@ org.apache.hadoop.hdfs.security.token.block.SecurityTestUtil	295.0	1749.0	18.0	2
 org.apache.hadoop.hdfs.protocol.datatransfer.TestPacketReceiver	259.0	365.0	25.0	94.0
 org.apache.hadoop.hdfs.protocol.datatransfer.sasl.SaslDataTransferTestCase	417.0	501.0	21.0	123.0
 org.apache.hadoop.hdfs.protocol.datatransfer.sasl.TestSaslDataTransfer	693.0	1381.0	28.0	260.0
-org.apache.hadoop.TestRefreshCallQueue  417.0   523.0   35.0    144.0
-org.apache.hadoop.TestGenericRefresh    781.0   1617.0  20.0    200.0
+org.apache.hadoop.TestRefreshCallQueue	417.0	523.0	35.0	144.0
+org.apache.hadoop.TestGenericRefresh	781.0	1617.0	20.0	200.0
+org.apache.hadoop.hbase.wal.TestWALFactory	1000.0	1000.0	1000.0	1000.0

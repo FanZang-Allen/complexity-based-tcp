@@ -74,23 +74,13 @@ def load_halstead_mp():
 
 def extract_ctest_halstead(proj_name):
     CUR_DIR = os.path.dirname(os.path.realpath(__file__))
-    # halstead_file = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}.tsv").format(proj_name, proj_name)
-    # halstead_data = [x.strip("\n").split("\t") for x in open(halstead_file)]
     ctest_file = os.path.join(CUR_DIR, "testInfo/cyclomaticComplexity/{}/{}-ctest.tsv").format(proj_name, proj_name)
     ctest_name = [x.strip("\n").split("\t")[0] for x in open(ctest_file)]
     inherit_info_file = os.path.join(CUR_DIR, "testInfo/general/{}/{}.json").format(proj_name, proj_name)
     with open(inherit_info_file, 'r') as file:
         inherit_info = json.load(file)
-    # halstead_mp = {}
     ctest_halstead_simple = {}
     ctest_halstead_inherit = {}
-    # for class_info in halstead_data:
-    #     for i in range(1, len(class_info)):
-    #         if not class_info[i].endswith(".0"):
-    #             class_info[i] += "00.0"   # the tool fail to calculate metric for this file due to memory constraint
-    #     class_name = class_info[0]
-    #     N1, N2, n1, n2 = [float(x) for x in class_info[1:]] # Total operator, Total operand, Unique operator, Unique operand
-    #     halstead_mp[class_name] = calculate_halstead_metric(N1, N2, n1, n2)
 
     for ctest in ctest_name:
         ctest_class = ctest.split("#")[0]
@@ -106,6 +96,8 @@ def extract_ctest_halstead(proj_name):
             N2 += pN2
             n1 += pn1
             n2 += pn2
+            if parent_class not in inherit_info:
+                break
             parent_class = inherit_info[parent_class]['parent']
         ctest_halstead_inherit[ctest] = calculate_halstead_metric(N1, N2, n1, n2)
     
@@ -125,6 +117,4 @@ def extract_ctest_halstead(proj_name):
 if __name__ == "__main__":
     #extract_ctest_cyclomatic(project_name[1])
     load_halstead_mp()
-    extract_ctest_halstead(project_name[1])
-    # for i in range(len(project_name)):
-    #     extract_ctest_halstead(project_name[i])
+    extract_ctest_halstead(project_name[4])
