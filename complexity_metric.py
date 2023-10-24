@@ -34,17 +34,6 @@ def extract_java_files(directory: str):
     return java_files
 
 
-def extract_method_name(java_file_path):
-    command = exe_command + ' ' + len_config_file + ' ' + java_file_path
-    result = subprocess.run(command, shell=True, cwd='./', stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-    output = result.stdout.splitlines()
-    name_list = []
-    for i in range(1, len(output) - 1):
-        curr = output[i].split(':')
-        name_list.append(curr[-1].split(' ')[2])
-    return name_list
-
-
 def extract_method_names(java_file_path, starting_line_numbers):
     # extract names of test method given the start line
     method_names = []

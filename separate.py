@@ -1,15 +1,9 @@
 import csv
-
+import os
+import math
+import json
 project_name = ['hadoop-common', 'hadoop-hdfs', 'alluxio-core', 'hbase-server', 'zookeeper-server']
-ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/hadoop-common/hadoop-common-testcase.tsv'
-#ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/hadoop-hdfs/hadoop-hdfs-testcase.tsv'
-#ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/alluxio-core/alluxio-core-testcase.tsv'
-#ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/hbase-server/hbase-server-testcase.tsv'
-#ctest_tsv = '/home/fanzang2/project/ctest-prio-ae/testInfo/execTime/zookeeper-server/zookeeper-server-testcase.tsv'
-all_test_file = '/home/fanzang2/project/complexity-based-tcp/hadoop-common.tsv'
-output_file = '/home/fanzang2/project/complexity-based-tcp/hadoop-common-direct.tsv'
-missing_file = '/home/fanzang2/project/complexity-based-tcp/hadoop-common-inherit.tsv'
-
+halstead_mp = {}
 
 
 def extract_ctest_cyclomatic(proj_name):
@@ -56,7 +50,81 @@ def extract_ctest_cyclomatic(proj_name):
                 else:
                     print('Ctest: ' + key + ' not found')
 
+def calculate_halstead_metric(N1, N2, n1, n2):
+    N = N1 + N2  # Program Length
+    n = n1 + n2  # Program Vocabulary
+    V = N * math.log2(n) # Program Volume
+    D = (n1 / 2) * (N2 / n2) # Program Difficulty
+    E = D * V # Program Effort
+    return [N1, N2, n1, n2, N, n, V, D, E]
+
+def load_halstead_mp():
+    CUR_DIR = os.path.dirname(os.path.realpath(__file__))
+    global halstead_mp
+    for proj_name in project_name:
+        halstead_file = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}.tsv").format(proj_name, proj_name)
+        halstead_data = [x.strip("\n").split("\t") for x in open(halstead_file)]
+        for class_info in halstead_data:
+            for i in range(1, len(class_info)):
+                if not class_info[i].endswith(".0"):
+                    class_info[i] += "00.0"   # the tool fail to calculate metric for this file due to memory constraint
+            class_name = class_info[0]
+            N1, N2, n1, n2 = [float(x) for x in class_info[1:]] # Total operator, Total operand, Unique operator, Unique operand
+            halstead_mp[class_name] = calculate_halstead_metric(N1, N2, n1, n2)
+
+def extract_ctest_halstead(proj_name):
+    CUR_DIR = os.path.dirname(os.path.realpath(__file__))
+    # halstead_file = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}.tsv").format(proj_name, proj_name)
+    # halstead_data = [x.strip("\n").split("\t") for x in open(halstead_file)]
+    ctest_file = os.path.join(CUR_DIR, "testInfo/cyclomaticComplexity/{}/{}-ctest.tsv").format(proj_name, proj_name)
+    ctest_name = [x.strip("\n").split("\t")[0] for x in open(ctest_file)]
+    inherit_info_file = os.path.join(CUR_DIR, "testInfo/general/{}/{}.json").format(proj_name, proj_name)
+    with open(inherit_info_file, 'r') as file:
+        inherit_info = json.load(file)
+    # halstead_mp = {}
+    ctest_halstead_simple = {}
+    ctest_halstead_inherit = {}
+    # for class_info in halstead_data:
+    #     for i in range(1, len(class_info)):
+    #         if not class_info[i].endswith(".0"):
+    #             class_info[i] += "00.0"   # the tool fail to calculate metric for this file due to memory constraint
+    #     class_name = class_info[0]
+    #     N1, N2, n1, n2 = [float(x) for x in class_info[1:]] # Total operator, Total operand, Unique operator, Unique operand
+    #     halstead_mp[class_name] = calculate_halstead_metric(N1, N2, n1, n2)
+
+    for ctest in ctest_name:
+        ctest_class = ctest.split("#")[0]
+        ctest_halstead_simple[ctest] = halstead_mp[ctest_class]
+    
+    for ctest in ctest_name:
+        ctest_class = ctest.split("#")[0]
+        N1, N2, n1, n2 = halstead_mp[ctest_class][:4]
+        parent_class = inherit_info[ctest_class]['parent']
+        while parent_class != None and parent_class in halstead_mp:
+            pN1, pN2, pn1, pn2 = halstead_mp[parent_class][:4]
+            N1 += pN1
+            N2 += pN2
+            n1 += pn1
+            n2 += pn2
+            parent_class = inherit_info[parent_class]['parent']
+        ctest_halstead_inherit[ctest] = calculate_halstead_metric(N1, N2, n1, n2)
+    
+    ctest_simple_file = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}-ctest-simple.tsv").format(proj_name, proj_name)
+    ctest_inherit_file = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}-ctest-inherit.tsv").format(proj_name, proj_name)
+
+    with open(ctest_simple_file, 'w') as f:
+        for name, info in ctest_halstead_simple.items():
+            f.write(name + "\t" + "\t".join([str(x) for x in info]) + "\n")
+    
+
+    with open(ctest_inherit_file, 'w') as f:
+        for name, info in ctest_halstead_inherit.items():
+            f.write(name + "\t" + "\t".join([str(x) for x in info]) + "\n")
 
 
-extract_ctest_cyclomatic(project_name[1])
-
+if __name__ == "__main__":
+    #extract_ctest_cyclomatic(project_name[1])
+    load_halstead_mp()
+    extract_ctest_halstead(project_name[1])
+    # for i in range(len(project_name)):
+    #     extract_ctest_halstead(project_name[i])

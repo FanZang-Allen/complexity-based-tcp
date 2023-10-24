@@ -25,7 +25,7 @@ def extract_package_name(java_file_path):
             return None
 
 def extract_sub_directory(directory):
-    subdirectories = []
+    subdirectories = ['']
     for root, dirs, files in os.walk(directory):
         for dir_name in dirs:
             subdirectory = os.path.relpath(os.path.join(root, dir_name), directory)
@@ -67,6 +67,8 @@ def extract_metric(directory, subdirectories, project_name):
         #    continue
         test_dir = directory + sub
         output_dir = output_folder + project_name + '/' + sub + '/'
+        if sub == '':
+            output_dir = output_folder + project_name + '/'
         command = command_head + ' ' + test_dir + ' ' + output_dir + ' ' + output_type
         #print(command)
         long_file = []
@@ -109,5 +111,3 @@ subdirectories = extract_sub_directory(test_directory_list[4])
 create_halstead_result_directory(subdirectories, project_name_list[4])
 
 extract_metric(test_directory_list[4], subdirectories, project_name_list[4])
-
-#store_result(project_name_list[0])
