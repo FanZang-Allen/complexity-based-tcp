@@ -70,7 +70,6 @@ def extract_metric(directory, subdirectories, project_name):
         if sub == '':
             output_dir = output_folder + project_name + '/'
         command = command_head + ' ' + test_dir + ' ' + output_dir + ' ' + output_type
-        #print(command)
         long_file = []
         for filename in os.listdir(test_dir):
             #print(filename)
