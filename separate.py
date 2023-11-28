@@ -2,8 +2,7 @@ import csv
 import os
 import math
 import json
-project_name = ['hadoop-common', 'hadoop-hdfs', 'alluxio-core', 'hbase-server', 'zookeeper-server']
-halstead_mp = {}
+from config import *
 
 
 def extract_ctest_cyclomatic(proj_name):
@@ -60,9 +59,11 @@ def calculate_halstead_metric(N1, N2, n1, n2):
 
 def load_halstead_mp():
     CUR_DIR = os.path.dirname(os.path.realpath(__file__))
-    global halstead_mp
-    for proj_name in project_name:
+    halstead_mp = {}
+    for proj_name in ALLAPPS:
         halstead_file = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}.tsv").format(proj_name, proj_name)
+        if not os.path.isfile(halstead_file):
+            continue
         halstead_data = [x.strip("\n").split("\t") for x in open(halstead_file)]
         for class_info in halstead_data:
             for i in range(1, len(class_info)):
@@ -71,12 +72,11 @@ def load_halstead_mp():
             class_name = class_info[0]
             N1, N2, n1, n2 = [float(x) for x in class_info[1:]] # Total operator, Total operand, Unique operator, Unique operand
             halstead_mp[class_name] = calculate_halstead_metric(N1, N2, n1, n2)
+    return halstead_mp
 
-def extract_ctest_halstead(proj_name):
-    CUR_DIR = os.path.dirname(os.path.realpath(__file__))
-    ctest_file = os.path.join(CUR_DIR, "testInfo/cyclomaticComplexity/{}/{}-ctest.tsv").format(proj_name, proj_name)
-    ctest_name = [x.strip("\n").split("\t")[0] for x in open(ctest_file)]
-    inherit_info_file = os.path.join(CUR_DIR, "testInfo/general/{}/{}.json").format(proj_name, proj_name)
+def extract_test_halstead(halstead_mp, test_file):
+    ctest_name = [x.strip("\n").split("\t")[0] for x in open(test_file)]
+    inherit_info_file = CLASS_INFO_FILE
     with open(inherit_info_file, 'r') as file:
         inherit_info = json.load(file)
     ctest_halstead_simple = {}
@@ -100,21 +100,18 @@ def extract_ctest_halstead(proj_name):
                 break
             parent_class = inherit_info[parent_class]['parent']
         ctest_halstead_inherit[ctest] = calculate_halstead_metric(N1, N2, n1, n2)
-    
-    ctest_simple_file = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}-ctest-simple.tsv").format(proj_name, proj_name)
-    ctest_inherit_file = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}-ctest-inherit.tsv").format(proj_name, proj_name)
 
-    with open(ctest_simple_file, 'w') as f:
+    with open(HALSTEAD_SIMPLE_FILE, 'w') as f:
         for name, info in ctest_halstead_simple.items():
             f.write(name + "\t" + "\t".join([str(x) for x in info]) + "\n")
     
 
-    with open(ctest_inherit_file, 'w') as f:
+    with open(HALSTEAD_INHERIT_FILE, 'w') as f:
         for name, info in ctest_halstead_inherit.items():
             f.write(name + "\t" + "\t".join([str(x) for x in info]) + "\n")
 
 
 if __name__ == "__main__":
     #extract_ctest_cyclomatic(project_name[1])
-    load_halstead_mp()
-    extract_ctest_halstead(project_name[4])
+    halstead_mp = load_halstead_mp()
+    extract_test_halstead(halstead_mp, CTEST_COMPLEXITY_TSV_FILE)

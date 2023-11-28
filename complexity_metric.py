@@ -4,21 +4,12 @@ import os
 import fnmatch
 import csv
 import json
+from config import *
 
 # using checkstyle tool to walk through test file to calculate cyclomatic complexity of each test method
 
-exe_command = 'java -jar checkstyle-10.12.3-all.jar -c'
-cyclo_config_file = '/home/fanzang2/project/complexity-based-tcp/cyclomatic_check.xml'
-#test_directory = '/home/fanzang2/project/app/ctest-hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/'
-test_directory = '/home/fanzang2/project/app/ctest-hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop'
-#test_directory = '/home/fanzang2/project/app/ctest-alluxio/core/'
-#test_directory = '/home/fanzang2/project/app/ctest-hbase/hbase-server/src/test/java/org/apache/hadoop/hbase/'
-#test_directory = '/home/fanzang2/project/app/ctest-zookeeper/zookeeper-server/src/test/java/org/apache/zookeeper/'
-project_name = 'hadoop-hdfs'
 complexity_info = {}
-complexity_tsv_file_path = project_name + '.tsv'
 test_class_info = {}
-test_class_info_json_path = project_name + '.json'
 load_complexity_info = None
 load_class_info = None
 
@@ -123,7 +114,7 @@ def process_checkstyle_output(checkstyle_output):
 
 
 def extract_method_complexity(java_file_path):
-    command = exe_command + ' ' + cyclo_config_file + ' ' + java_file_path
+    command = CHECKSTYLE_CMD + ' ' + CHECKSTYLE_CONFIG_FILE + ' ' + java_file_path
     result = subprocess.run(command, shell=True, cwd='./', stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     output = result.stdout.splitlines()
     checkstyle_output = output[1:-1]
@@ -147,23 +138,15 @@ def extract_inherit_method_complexity():
                 if m not in info["methods"]:
                     if complete_name in complexity_info:
                         complexity_info[name +'#'+ m] = complexity_info[complete_name]
-#                    elif load_complexity_info != None and complete_name in load_complexity_info:
-#                        complexity_info[complete_name] = load_complexity_info[complete_name]
-#                        complexity_info[name +'#'+ m] = complexity_info[complete_name]
             parent_class = test_class_info[parent_class]["parent"]
 
 
 
 def load_calculated_info(complexity_path, info_path):
+    if complexity_path == None or info_path == None:
+        return
     with open(info_path, 'r') as file:
         load_class_info = json.load(file)
-#    missing_class = []
-#    for name, info in test_class_info.items():
-#        parent_class = info["parent"]
-#        if parent_class not in test_class_info and parent_class in load_class_info:
-#            missing_class.append(parent_class)
-#    for m in missing_class:
-#        test_class_info[m] = load_class_info[m]
     test_class_info.update(load_class_info)
     load_complexity_info = {}
     with open(complexity_path, 'r') as tsv_file:
@@ -172,21 +155,26 @@ def load_calculated_info(complexity_path, info_path):
             load_complexity_info[method] = metric
     complexity_info.update(load_complexity_info)
 
-java_files = extract_java_files(test_directory)
-for i in range(len(java_files)):
-    extract_method_complexity(java_files[i])
-    print(f"Complete java file:{java_files[i]}, index: {i}")
 
-load_calculated_info('/home/fanzang2/project/complexity-based-tcp/hadoop-common.tsv', '/home/fanzang2/project/complexity-based-tcp/hadoop-common.json')
+def compute_cyclomatic_metric():
 
-with open(test_class_info_json_path, 'w') as json_file:
-    json.dump(test_class_info, json_file)
+    java_files = extract_java_files(TEST_DIR)
+    for i in range(len(java_files)):
+        extract_method_complexity(java_files[i])
+        print(f"Complete java file:{java_files[i]}, index: {i}")
 
-#print(len(complexity_info))
-extract_inherit_method_complexity()
-#print(len(complexity_info))
-with open(complexity_tsv_file_path, 'a', newline='') as tsvfile:
-    writer = csv.writer(tsvfile, delimiter='\t')
-    for key, value in complexity_info.items():
-        writer.writerow([key, value])
+    if LOAD_COMPLEXITY_FILE != None and LOAD_CLASSINFO_FILE != None:
+        load_calculated_info(LOAD_COMPLEXITY_FILE, LOAD_CLASSINFO_FILE)
 
+    with open(CLASS_INFO_FILE, 'w') as json_file:
+        json.dump(test_class_info, json_file)
+    
+    print(f"Project class info is stored in {CLASS_INFO_FILE}")
+
+    extract_inherit_method_complexity()
+    with open(COMPLEXITY_TSV_FILE, 'a', newline='') as tsvfile:
+        writer = csv.writer(tsvfile, delimiter='\t')
+        for key, value in complexity_info.items():
+            writer.writerow([key, value])
+
+    print(f"Project cyclomatic complexity  info is stored in {COMPLEXITY_TSV_FILE}")

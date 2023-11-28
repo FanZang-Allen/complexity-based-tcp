@@ -3,14 +3,7 @@ import os
 import re
 import csv
 import shutil
-test_directory_list = ['/home/fanzang2/project/app/ctest-hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/', 
-                       '/home/fanzang2/project/app/ctest-hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop/',
-                       '/home/fanzang2/project/app/ctest-alluxio/core/',
-                       '/home/fanzang2/project/app/ctest-hbase/hbase-server/src/test/java/org/apache/hadoop/hbase/',
-                       '/home/fanzang2/project/app/ctest-zookeeper/zookeeper-server/src/test/java/org/apache/zookeeper/']
-
-project_name_list = ['hadoop-common', 'hadoop-hdfs', 'alluxio-core', 'hbase-server', 'zookeeper-server']
-output_folder = '/home/fanzang2/project/complexity-based-tcp/halsteadResult/'
+from config import *
 
 halstead_metric_result = {}
 
@@ -35,7 +28,7 @@ def extract_sub_directory(directory):
 
 def create_halstead_result_directory(subdirectories, project_name):
     for d in subdirectories:
-        target_directory = output_folder + project_name + '/' + d
+        target_directory = HALSTEAD_LOG_DIR + project_name + '/' + d
         os.makedirs(target_directory, exist_ok=True)
 
 
@@ -59,27 +52,22 @@ def count_lines(filename):
 
 def extract_metric(directory, subdirectories, project_name):
     global halstead_metric_result
-    command_head = 'java -jar HalsteadMetricsCMD.jar'
-    output_type = 'html'
-    skip_function = ['MultiThreadedUpdater.java']
     for index, sub in enumerate(subdirectories):
-        #if index < 11:
-        #    continue
         test_dir = directory + sub
-        output_dir = output_folder + project_name + '/' + sub + '/'
+        output_dir = HALSTEAD_LOG_DIR + project_name + '/' + sub + '/'
         if sub == '':
-            output_dir = output_folder + project_name + '/'
-        command = command_head + ' ' + test_dir + ' ' + output_dir + ' ' + output_type
+            output_dir = HALSTEAD_LOG_DIR + project_name + '/'
+        command = HALSTEAD_CMD + ' ' + test_dir + ' ' + output_dir + ' ' + HALSTEAD_OUTPUT_TYPE
         long_file = []
         for filename in os.listdir(test_dir):
             #print(filename)
             if filename.endswith(".java"):
                 length = count_lines(test_dir +'/' +  filename)
-                if length > 500 or filename in skip_function:
+                if length > 500 or filename in HALSTEAD_SKIP_FUC:
                     new_name = os.path.join(test_dir, filename[:-1])
                     package_name = extract_package_name(test_dir + '/' + filename)
                     halstead_metric_result[package_name] = [str(length), str(length),str(length),str(length)]
-                    print(f"change file {filename} name to {new_name}")
+                    # print(f"change file {filename} name to {new_name}")
                     shutil.move(os.path.join(test_dir, filename), new_name)
 
         result = subprocess.run(command, shell=True, cwd='./', stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -93,7 +81,7 @@ def extract_metric(directory, subdirectories, project_name):
                 parse_output_html(package_name, output_file)
             if filename.endswith(".jav"):
                 shutil.move(os.path.join(test_dir, filename), os.path.join(test_dir, filename + 'a'))
-                print(f"change file {filename} name back to {os.path.join(test_dir, filename + 'a')}")
+                # print(f"change file {filename} name back to {os.path.join(test_dir, filename + 'a')}")
         store_result(project_name)
         halstead_metric_result = {}
         #break
@@ -105,8 +93,3 @@ def store_result(project_name):
         for key, value in halstead_metric_result.items():
             writer.writerow([key] + value)
 
-subdirectories = extract_sub_directory(test_directory_list[4])
-
-create_halstead_result_directory(subdirectories, project_name_list[4])
-
-extract_metric(test_directory_list[4], subdirectories, project_name_list[4])
