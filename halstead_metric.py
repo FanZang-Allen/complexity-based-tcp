@@ -82,13 +82,12 @@ def extract_metric(directory, subdirectories, project_name):
             if filename.endswith(".jav"):
                 shutil.move(os.path.join(test_dir, filename), os.path.join(test_dir, filename + 'a'))
                 # print(f"change file {filename} name back to {os.path.join(test_dir, filename + 'a')}")
-        store_result(project_name)
+        store_result()
         halstead_metric_result = {}
         #break
 
-def store_result(project_name):
-    file_name = project_name + '.tsv'
-    with open(file_name, 'a', newline='') as tsvfile:
+def store_result():
+    with open(HALSTEAD_FILE, 'a', newline='') as tsvfile:
         writer = csv.writer(tsvfile, delimiter='\t')
         for key, value in halstead_metric_result.items():
             writer.writerow([key] + value)

@@ -1,10 +1,12 @@
 import os
 
+JAVA_11_HOME = "/usr/lib/jvm/java-11-openjdk-amd64/bin/java"
+JAVA_8_HOME = "/usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java"
 CUR_DIR = os.path.dirname(os.path.realpath(__file__))
 CHECKSTYLE_CONFIG_FILE = os.path.join(CUR_DIR, "cyclomatic_check.xml")
-CHECKSTYLE_CMD = "java -jar checkstyle-10.12.3-all.jar -c"
+CHECKSTYLE_CMD = JAVA_11_HOME +  " -jar checkstyle-10.12.3-all.jar -c"
 
-HALSTEAD_CMD = 'java -jar HalsteadMetricsCMD.jar'
+HALSTEAD_CMD = JAVA_8_HOME +  ' -jar HalsteadMetricsCMD.jar'
 HALSTEAD_OUTPUT_TYPE = 'html'
 HALSTEAD_SKIP_FUC = []
 HALSTEAD_LOG_DIR = os.path.join(CUR_DIR, "halsteadResult/")
@@ -30,6 +32,7 @@ TEST_DIR = HCOMMON_TEST_DIR
 COMPLEXITY_TSV_FILE = os.path.join(CUR_DIR, f"testInfo/cyclomaticComplexity/{PROJECT_NAME}/{PROJECT_NAME}.tsv")
 CTEST_COMPLEXITY_TSV_FILE = os.path.join(CUR_DIR, f"testInfo/cyclomaticComplexity/{PROJECT_NAME}/{PROJECT_NAME}-ctest.tsv")
 CLASS_INFO_FILE = os.path.join(CUR_DIR, f"testInfo/general/{PROJECT_NAME}/{PROJECT_NAME}.json")
+HALSTEAD_FILE = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}.tsv").format(PROJECT_NAME, PROJECT_NAME)
 HALSTEAD_SIMPLE_FILE = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}-simple.tsv").format(PROJECT_NAME, PROJECT_NAME)
 HALSTEAD_INHERIT_FILE = os.path.join(CUR_DIR, "testInfo/halsteadMetric/{}/{}-inherit.tsv").format(PROJECT_NAME, PROJECT_NAME)
 
