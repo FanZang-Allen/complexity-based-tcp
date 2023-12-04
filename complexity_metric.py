@@ -127,6 +127,7 @@ def extract_method_complexity(java_file_path):
 
 
 def extract_inherit_method_complexity():
+    # use calculated inheritance relationship to update cyclomatic metrics
     for name, info in test_class_info.items():
         parent_class = info["parent"]
         while parent_class != None:
@@ -143,6 +144,7 @@ def extract_inherit_method_complexity():
 
 
 def load_calculated_info(complexity_path, info_path):
+    # load pre-computed metrics that are used in current module
     if complexity_path == None or info_path == None:
         return
     with open(info_path, 'r') as file:

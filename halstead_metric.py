@@ -5,6 +5,8 @@ import csv
 import shutil
 from config import *
 
+# using tool developed by Specksboy Inc to compute halstead metrics of all java test programs in given folder
+
 halstead_metric_result = {}
 
 def extract_package_name(java_file_path):
