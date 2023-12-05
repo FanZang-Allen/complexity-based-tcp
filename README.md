@@ -15,3 +15,26 @@ detection. There are already a bunch of researches in exploring effectiveness of
 - Python3 >= 3.5.0.
 - Java 11: run [checkstyle](https://checkstyle.sourceforge.io/) tool to compute cyclomatic complexity metric of java test cases
 - Java 8: run tool developed by [Speckboy Inc.](https://sourceforge.net/projects/halsteadmetricstool/) to compute halstead software metric of java program
+
+### Add Project
+
+Clone the following projects:
+
+- Hadoop: git clone https://github.com/xlab-uiuc/hadoop.git app/ctest-hadoop
+- Zookeeper: git clone https://github.com/xlab-uiuc/zookeeper.git app/ctest-zookeeper
+- Hbase: git clone https://github.com/xlab-uiuc/hbase.git app/ctest-hbase
+- Alluxio: git clone https://github.com/xlab-uiuc/alluxio.git app/ctest-alluxio
+
+### Configuration
+
+
+
+### Reproducibility
+
+### Extension
+
+## Collected Test Information
+
+## Contact
+
+For questions about this project or artifact, please contact [Fan Zang](fanzang2@illinois.edu)
