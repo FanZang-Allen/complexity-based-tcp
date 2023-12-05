@@ -23,8 +23,8 @@ ALLUXIO = "alluxio-core"
 ZOOKEEPER = "zookeeper-server"
 ALLAPPS = [HCOMMON, HDFS, HBASE, ZOOKEEPER, ALLUXIO]
 ALLAPPS_AB = ["HCommon", "HDFS", "HBase", "ZooKeeper", "Alluxio"]
-# change this to your folder where you clone the ctest projects
-PROJECT_DIR = '/home/fanzang2/project/app/'
+# change this to your folder where you clone the ctest projects(this is default one if you follow README)
+PROJECT_DIR = os.path.join(CUR_DIR, "app/")
 HCOMMON_TEST_DIR = os.path.join(PROJECT_DIR, 'ctest-hadoop/hadoop-common-project/hadoop-common/src/test/java/org/apache/hadoop/')
 HDFS_TEST_DIR = os.path.join(PROJECT_DIR, 'ctest-hadoop/hadoop-hdfs-project/hadoop-hdfs/src/test/java/org/apache/hadoop')
 ALLUXIO_TEST_DIR = os.path.join(PROJECT_DIR, 'ctest-alluxio/core/')
